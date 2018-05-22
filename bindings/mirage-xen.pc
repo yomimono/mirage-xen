@@ -7,4 +7,4 @@ Version: 3.0.0
 URL: https://github.com/mirage/mirage-xen/
 Description: Core platform libraries for Mirage on Xen
 Libs: ${libdir}/mirage-xen/libmirage-xen_bindings.a
-Requires: mirage-xen-ocaml
+Requires: ocaml-freestanding
