@@ -22,7 +22,12 @@
 #include <caml/memory.h>
 #include <caml/bigarray.h>
 
-#include <mini-os/os.h>
+#ifdef __X86_64__
+#include <xen-x86/os.h>
+#endif
+#ifdef __ARM32__
+#include <xen-arm/os.h>
+#endif
 #define xen_mb() mb()
 #define xen_wmb() wmb()
 
