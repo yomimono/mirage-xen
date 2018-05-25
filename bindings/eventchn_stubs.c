@@ -13,9 +13,14 @@
  * GNU Lesser General Public License for more details.
  */
 
-#include <mini-os/os.h>
-#include <mini-os/time.h>
-#include <mini-os/events.h>
+#ifdef __X86_64__
+#include <xen-x86/os.h>
+#endif
+#ifdef __ARM32__
+#include <xen-arm/os.h>
+#endif
+#include <uk/plat/time.h>
+#include <common/events.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>

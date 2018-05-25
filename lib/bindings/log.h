@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2015 Thomas Leonard <talex5@gmail.com>
+/* Copyright (C) 2011 Citrix Systems Inc
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,34 +13,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <caml/mlvalues.h>
-#ifdef __X86_64__
-#include <xen-x86/mm.h>
-#endif
-#ifdef __ARM32__
-#include <xen-arm/mm.h>
-#endif
+#define printk(_f, _a...) do {\
+  const char *filename = strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__; \
+  printk("%s: " _f, filename, ## _a); \
+} while (0) 
 
-CAMLprim value
-stub_heap_get_pages_total(value unit) // noalloc
-{
-  return Val_long(minios_heap_pages_total);
-}
-
-CAMLprim value
-stub_heap_get_pages_used(value unit) // noalloc
-{
-  return Val_long(minios_heap_pages_used);
-}
-
-/* expose the virt_to_mfn macro for converting a "virtual address number"
- * (AKA "a pointer") to a machine frame number
-*/
-CAMLprim value
-stub_virt_to_mfn(value page)
-{
-  CAMLparam1(page);
-  CAMLlocal1(result);
-  result = caml_copy_nativeint(virt_to_mfn(Nativeint_val(page)));
-  CAMLreturn(result);
-}

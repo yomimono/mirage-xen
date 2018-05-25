@@ -14,12 +14,17 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <mini-os/os.h>
-#include <mini-os/sched.h>
-#include <mini-os/events.h>
-#include <mini-os/console.h>
-#include <mini-os/gnttab.h>
-#include <mini-os/time.h>
+#ifdef __X86_64__
+#include <xen-x86/os.h>
+#endif
+#ifdef __ARM32__
+#include <xen-arm/os.h>
+#endif
+#include <xen/sched.h>
+#include <common/events.h>
+#include <uk/plat/console.h>
+//#include <mini-os/gnttab.h> (I think this is provided by xen-gnt)
+#include <uk/plat/time.h>
 #include <time.h>
 
 #include <caml/mlvalues.h>
@@ -48,7 +53,7 @@ caml_block_domain(value v_until)
   CAMLreturn(Val_unit);
 }
 
-void app_main_thread(void *unused)
+void app_main(void *unused)
 {
   local_irq_save(irqflags);
   caml_startup(argv);
@@ -76,7 +81,7 @@ void start_kernel(void)
 
   /* Init time and timers. Needed for block_domain. */
   init_time();
-  not_running_time = monotonic_clock();
+  not_running_time = ukplat_monotonic_clock();
 
   /* Init the console driver.
    * We probably do need this if we want printk to send notifications correctly. */

@@ -14,7 +14,7 @@
 /* $Id: exit.c,v 1.9 2001/12/07 13:40:28 xleroy Exp $ */
 
 #include <caml/mlvalues.h>
-#include <mini-os/kernel.h>
+//#include <mini-os/kernel.h>
 
 CAMLprim value unix_exit(value n)
 {
