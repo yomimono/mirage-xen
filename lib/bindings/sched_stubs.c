@@ -53,43 +53,5 @@ stub_hypervisor_suspend(value unit)
 
   printk("WARNING: stub_hypervisor_suspend not yet implemented\n");
   cancelled = 1;
-#if 0
-  /* Turn the store and console mfns to pfns - required because xc_domain_restore uses these values */
-  start_info.store_mfn = mfn_to_pfn(start_info.store_mfn);
-  start_info.console.domU.mfn = mfn_to_pfn(start_info.console.domU.mfn);
-
-  /* canonicalize_pagetables can't cope with pagetable entries that are outside of the guest's mfns,
-     so we must unmap anything outside of our space */
-  unmap_shared_info();
-
-  /* Actually do the suspend. When this function returns 0, we've been resumed */
-  cancelled = HYPERVISOR_suspend(virt_to_mfn(&start_info));
-
-  if(cancelled) {
-    start_info.store_mfn = pfn_to_mfn(start_info.store_mfn);
-    start_info.console.domU.mfn = pfn_to_mfn(start_info.console.domU.mfn);
-  }
-
-  /* Reinitialise several things */
-  trap_init();
-  init_events();
-
-  /* ENABLE EVENT DELIVERY. This is disabled at start of day. */
-  local_irq_enable();
-
-  setup_xen_features();
-  HYPERVISOR_shared_info = map_shared_info(start_info.shared_info);
-
-  /* Set up event and failsafe callback addresses. */
-  HYPERVISOR_set_callbacks(
-						   (unsigned long)hypervisor_callback,
-						   (unsigned long)failsafe_callback, 0);
-
-  init_time();
-  arch_rebuild_p2m();
-
-  unmask_evtchn(start_info.console.domU.evtchn);
-  unmask_evtchn(start_info.store_evtchn);
-#endif
   CAMLreturn(Val_int(cancelled));
 }
