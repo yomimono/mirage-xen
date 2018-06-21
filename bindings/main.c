@@ -21,36 +21,37 @@
 #include <xen-arm/os.h>
 #endif
 #include <xen/sched.h>
+#include <common/console.h>
 #include <common/events.h>
+#include <common/gnttab.h>
 #include <uk/plat/console.h>
-//#include <mini-os/gnttab.h> (I think this is provided by xen-gnt)
 #include <uk/plat/time.h>
+#include <uk/plat/bootstrap.h>
 #include <time.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/callback.h>
 
-extern void gnttab_init(void);
+#include <uk/print.h>
 
 void _exit(int);
 int errno;
 static char *argv[] = { "mirage", NULL };
 static unsigned long irqflags;
 
-s_time_t not_running_time = 0;
+typedef int64_t s_time_t; //TODO this is copied from minios-xen time.t; unikraft uses s_time_t only internally and only then for arm
 
-/* XXX TODO: keep in sync with mirage-xen-minios */
-void setup_xen_features(void);
+s_time_t not_running_time = 0;
 
 CAMLprim value
 caml_block_domain(value v_until)
 {
   CAMLparam1(v_until);
   s_time_t t0, t1;
-  t0 = monotonic_clock();
+  t0 = ukplat_monotonic_clock();
   block_domain((s_time_t)(Int64_val(v_until)));
-  t1 = monotonic_clock();
+  t1 = ukplat_monotonic_clock();
   not_running_time += t1 - t0;
   CAMLreturn(Val_unit);
 }
@@ -62,12 +63,7 @@ void app_main(void *unused)
   _exit(0);
 }
 
-void minios_show_banner(void)
-{
-  printk("\x1b[32;1mMirageOS booting...\x1b[0m\n");
-}
-
-void start_kernel(void)
+void start_kernel(void* nonsense)
 {
   /* Set up events. */
   init_events();
@@ -75,36 +71,29 @@ void start_kernel(void)
   /* Enable event delivery. This is disabled at start of day. */
   local_irq_enable();
 
-  setup_xen_features();
+  //setup_xen_features();
 
-  /* Init memory management.
-   * Needed for malloc. */
-  init_mm();
+  /* MCP - pretty sure we don't actually need to do our own memory init, and it might
+   * be harmful to do so */
 
   /* Init time and timers. Needed for block_domain. */
-  init_time();
+  ukplat_time_init();
   not_running_time = ukplat_monotonic_clock();
 
   /* Init the console driver.
    * We probably do need this if we want printk to send notifications correctly. */
-  init_console();
+  _libxenplat_init_console();
 
   /* Init grant tables. */
   gnttab_init();
 
   /* Call our main function directly, without using Mini-OS threads. */
-  app_main_thread(NULL);
+  app_main(NULL);
 }
 
 void _exit(int ret)
 {
-  stop_kernel();
-  if (!ret) {
-    /* No problem, just shutdown.  */
-    struct sched_shutdown sched_shutdown = { .reason = SHUTDOWN_poweroff };
-    HYPERVISOR_sched_op(SCHEDOP_shutdown, &sched_shutdown);
-  }
-  do_exit();
+  ukplat_terminate(UKPLAT_HALT);
 }
 ssize_t write(int fd, const void* buf, size_t sz) {
   //if (fd == 1 || fd == 2) {
