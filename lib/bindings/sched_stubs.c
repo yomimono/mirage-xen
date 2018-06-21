@@ -18,7 +18,6 @@
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 
-shared_info_t *map_shared_info(unsigned long pa);
 void unmap_shared_info();
 void init_time();
 void arch_rebuild_p2m();
