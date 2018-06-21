@@ -174,7 +174,7 @@ stub_gnttab_init(value unit)
 CAMLprim value
 stub_gnttab_reserved(value unit)
 {
-    return Val_int(NR_RESERVED_ENTRIES);
+    return Val_int(GNTTAB_NR_RESERVED_ENTRIES);
 }
 
 CAMLprim value
