@@ -33,6 +33,8 @@ struct gntmap *map = NULL;
 
 /* Defined in minios gnttab.c: */
 extern grant_entry_t *gnttab_table;
+#define NR_GRANT_FRAMES 4
+#define NR_GRANT_ENTRIES (NR_GRANT_FRAMES * PAGE_SIZE / sizeof(grant_entry_v1_t))
 
 /* Note in particular EXTERNAL rather than MANAGED: we don't want anyone to
    call free() on a grant mapping -- nothing good can come of that. To quote
