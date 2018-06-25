@@ -1,5 +1,5 @@
 (** Get the start info page. *)
-
+(*
 type t = {
 	magic: string; (** "xen-<version>-<platform>". *)
 	nr_pages: int; (** Total pages allocated to this domain. *)
@@ -23,6 +23,10 @@ type t = {
 
 val get: unit -> t
 (** [get ()] is the record containing the start info page. *)
+*)
+
+val cmdline : unit -> string
+(** [cmdline ()] returns the command-line arguments passed to the unikernel at boot time. *)
 
 val console_start_page: unit -> Cstruct.t
 (** [console_start_page ()] is the console page automatically
@@ -31,3 +35,6 @@ val console_start_page: unit -> Cstruct.t
 val xenstore_start_page: unit -> Cstruct.t
 (** [xenstore_start_page ()] is the xenstore page automatically
     allocated by Xen. *)
+
+val xenstore_event_channel: unit -> int
+(** xenstore_event_channel ()] is the int to pass to Eventchn.of_int for the event channel. *)
