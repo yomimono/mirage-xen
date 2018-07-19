@@ -26,7 +26,6 @@ depends: [
   "mirage-xen-ocaml" {>= "2.6.0"}
   "io-page-xen" {>= "2.0.0"}
   "mirage-xen-minios" {>= "0.7.0"}
-  "minios-xen-pvh"
   "logs"
 ]
 available: [ ocaml-version >= "4.04.2" & os = "linux" ]
