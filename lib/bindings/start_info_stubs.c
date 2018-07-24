@@ -84,6 +84,18 @@ caml_console_start_page(value v_unit)
 #endif
 }
 
+CAMLprim value caml_xenstore_event_channel(value v_unit)
+{
+  CAMLparam1(v_unit);
+#ifdef CONFIG_PARAVIRT
+  CAMLreturn (Val_int(start_info.store_evtchn));
+#else
+  uint64_t evtchn;
+  hvm_get_parameter(HVM_PARAM_STORE_EVTCHN, &evtchn);
+  CAMLreturn (Val_int(evtchn));
+#endif
+}
+
 CAMLprim value
 caml_xenstore_start_page(value v_unit)
 {
