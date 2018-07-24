@@ -30,6 +30,7 @@
 #include <xen/hvm/params.h>
 #endif
 
+#ifdef CONFIG_PARAVIRT
 CAMLprim value
 stub_start_info_get(value unit)
 {
@@ -38,7 +39,6 @@ stub_start_info_get(value unit)
   char buf[MAX_GUEST_CMDLINE+1];
 
   result = caml_alloc_tuple(16);
-#ifdef CONFIG_PARAVIRT
   memcpy(buf, start_info.magic, sizeof(start_info.magic));
   buf[sizeof(start_info.magic)] = 0;
   tmp = caml_copy_string(buf);
@@ -61,12 +61,9 @@ stub_start_info_get(value unit)
   Store_field(result, 13, tmp);
   Store_field(result, 14, Val_int(start_info.first_p2m_pfn));
   Store_field(result, 15, Val_int(start_info.nr_p2m_frames));
-#else /* CONFIG_PARAVIRT */
-  /* TODO figure out which of these fields are meaningful and fill them */
-#endif
-
   CAMLreturn(result);
 }
+#endif
 
 CAMLprim value
 caml_console_start_page(value v_unit)
