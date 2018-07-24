@@ -66,6 +66,21 @@ stub_start_info_get(value unit)
 #endif
 
 CAMLprim value
+caml_cmdline(value v_unit)
+{
+  CAMLparam1(v_unit);
+  char buf[MAX_GUEST_CMDLINE+1];
+#ifdef CONFIG_PARAVIRT
+  memcpy(buf, start_info.cmd_line, MAX_GUEST_CMDLINE);
+#else /* CONFIG_PARAVIRT */
+  /* TODO: it's not clear to me whether we can extract this in the current mini-os API for HVM */
+  buf[0] = 0;
+#endif /* CONFIG_PARAVIRT */
+  buf[MAX_GUEST_CMDLINE] = 0;
+  CAMLreturn(caml_copy_string(buf));
+}
+
+CAMLprim value
 caml_console_start_page(value v_unit)
 {
   CAMLparam1(v_unit);
