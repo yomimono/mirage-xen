@@ -92,6 +92,8 @@ caml_console_start_page(value v_unit)
 #else /* CONFIG_PARAVIRT */
   uint64_t console;
   hvm_get_parameter(HVM_PARAM_CONSOLE_PFN, &console);
+  printk("console pfn: 0x%lx\n", console);
+  printk("console virt: 0x%lx\n", pfn_to_virt(console));
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
                                 pfn_to_virt(console),
@@ -107,6 +109,7 @@ CAMLprim value caml_xenstore_event_channel(value v_unit)
 #else
   uint64_t evtchn;
   hvm_get_parameter(HVM_PARAM_STORE_EVTCHN, &evtchn);
+  printk("event channel: %d\n", evtchn);
   CAMLreturn (Val_int(evtchn));
 #endif
 }
@@ -123,6 +126,8 @@ caml_xenstore_start_page(value v_unit)
 #else /* CONFIG_PARAVIRT */
   uint64_t store;
   store = hvm_get_parameter(HVM_PARAM_STORE_PFN, &store);
+  printk("xenstore pfn: 0x%lx\n", store);
+  printk("xenstore virt: 0x%lx\n", pfn_to_virt(store));
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
                                 pfn_to_virt(store),

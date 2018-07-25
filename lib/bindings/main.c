@@ -50,7 +50,9 @@ caml_block_domain(value v_until)
 
 void app_main_thread(void *unused)
 {
+  printk("saving IRQs\n");
   local_irq_save(irqflags);
+  printk("starting OCaml\n");
   caml_startup(argv);
   _exit(0);
 }
@@ -74,6 +76,8 @@ void start_kernel(void* nonsense)
    * Needed for malloc. */
   init_mm();
 
+  printk("memory manager initialized.  There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
+
   /* Init time and timers. Needed for block_domain. */
   init_time();
   not_running_time = monotonic_clock();
@@ -84,6 +88,17 @@ void start_kernel(void* nonsense)
 
   /* Init grant tables. */
   init_gnttab();
+
+  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
+
+  unsigned long* page = alloc_page();
+  printk("alloc_pages(0) returned %p\n", page);
+  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
+  free_page(page);
+  printk("freed the page at %p, order 0", page);
+  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
+
+  printk("calling app_main_thread(NULL)\n");
 
   /* Call our main function directly, without using Mini-OS threads. */
   app_main_thread(NULL);

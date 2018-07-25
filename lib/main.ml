@@ -53,6 +53,7 @@ let err exn =
 
 (* Execute one iteration and register a callback function *)
 let run t =
+  Printf.printf("run invoked\n%!");
   let t = call_hooks enter_hooks <&> t in
   let rec aux () =
     Lwt.wakeup_paused ();
