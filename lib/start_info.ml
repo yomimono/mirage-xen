@@ -1,4 +1,4 @@
-type t = {
+(* type t = {
 	magic: string;
 	nr_pages: int;
 	shared_info: int;
@@ -18,7 +18,7 @@ type t = {
 }
 
 external get: unit -> t = "stub_start_info_get"
-
+*)
 type page = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 external console_start_page': unit -> page = "caml_console_start_page"
