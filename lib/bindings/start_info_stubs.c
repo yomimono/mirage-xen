@@ -74,7 +74,7 @@ caml_cmdline(value v_unit)
   memcpy(buf, start_info.cmd_line, MAX_GUEST_CMDLINE);
 #else /* CONFIG_PARAVIRT */
   /* TODO: it's not clear to me whether we can extract this in the current mini-os API for HVM */
-  buf[0] = 0;
+  memcpy(buf, cmdline, MAX_GUEST_CMDLINE);
 #endif /* CONFIG_PARAVIRT */
   buf[MAX_GUEST_CMDLINE] = 0;
   CAMLreturn(caml_copy_string(buf));
