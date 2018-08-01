@@ -48,7 +48,7 @@ caml_block_domain(value v_until)
   CAMLreturn(Val_unit);
 }
 
-void app_main_thread(void *unused)
+void app_main(void *unused)
 {
   printk("saving IRQs\n");
   local_irq_save(irqflags);
@@ -96,7 +96,7 @@ void start_kernel(void* nonsense)
   printk("calling app_main(NULL)\n");
 
   /* Call our main function directly, without using Mini-OS threads. */
-  app_main_thread(NULL);
+  app_main(NULL);
 }
 
 void _exit(int ret)
