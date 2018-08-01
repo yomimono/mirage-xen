@@ -50,11 +50,6 @@ caml_block_domain(value v_until)
 
 void app_main(void *unused)
 {
-  void *leaky;
-  leaky = malloc(7);
-  printk("malloc(7): %p\n", leaky);
-  free(leaky);
-  printk("7-byte malloc free'd\n");
   printk("saving IRQs\n");
   local_irq_save(irqflags);
   printk("starting OCaml\n");
