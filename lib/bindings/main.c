@@ -89,16 +89,11 @@ void start_kernel(void* nonsense)
   /* Init grant tables. */
   init_gnttab();
 
-  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
+  /* unlike default minios kernel.c, we don't call init_sched() or init_xenbus(),
+   * as we don't want to use the minios scheduler and we have our own OCaml xenbus code
+   * that we want to run via the OCaml runtime */
 
-  unsigned long* page = alloc_page();
-  printk("alloc_pages(0) returned %p\n", page);
-  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
-  free_page(page);
-  printk("freed the page at %p, order 0", page);
-  printk("There are %lu pages total in the heap, and %lu used\n", minios_heap_pages_total, minios_heap_pages_used);
-
-  printk("calling app_main_thread(NULL)\n");
+  printk("calling app_main(NULL)\n");
 
   /* Call our main function directly, without using Mini-OS threads. */
   app_main_thread(NULL);
