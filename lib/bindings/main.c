@@ -52,8 +52,10 @@ void app_main(void *unused)
 {
   printk("saving IRQs\n");
   local_irq_save(irqflags);
-  printk("starting OCaml\n");
-  caml_startup(argv);
+  //printk("starting OCaml\n");
+  //caml_startup(argv);
+  printk("dividing by 0\n");
+  printk("1/0 = %d\n", (1/0));
   _exit(0);
 }
 
