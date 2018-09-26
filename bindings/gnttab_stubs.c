@@ -44,11 +44,38 @@ extern grant_entry_t *gnttab_table;
 
 void gnttab_init(void)
 {
-	init_gnttab();
-	/* FIXME: this should be done inside mini-os kernel.c */
-	map = (struct gntmap*) malloc(sizeof(struct gntmap));
-	gntmap_init(map);
-	printk("initialised mini-os gntmap\n");
+	CAMLparam1(unit);
+	CAMLlocal1(result);
+	if (!map) {
+		/* FIXME: this should be done inside mini-os kernel.c */
+		map = (struct gntmap*) malloc(sizeof(struct gntmap));
+		gntmap_init(map);
+		uk_pr_crit("initialised mini-os^Wunikraft gntmap\n");
+	}
+	result = Val_unit;
+	CAMLreturn(result);
+}
+
+CAMLprim value stub_gnttab_interface_close(value unit)
+{
+	CAMLparam1(unit);
+	CAMLreturn(Val_unit);
+}
+
+CAMLprim value stub_gnttab_allocates(void)
+{
+	CAMLparam0();
+	/* The mini-os API is now the same as the userspace Linux one: it
+	   returns fresh granted pages rather than expecting us to pass in
+	   an existing heap page. FIXME: remove the 'map_onto' API completely */
+	CAMLreturn(Val_bool(1));
+}
+
+CAMLprim value stub_gntshr_allocates(void)
+{
+	CAMLparam0();
+	/* We still manage our grant references from the OCaml code */
+	CAMLreturn(Val_bool(0));
 }
 
 static void *

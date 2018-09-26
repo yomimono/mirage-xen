@@ -17,6 +17,9 @@
 #include <stdint.h>
 #include <assert.h>
 
+//for wmb, mb
+#include <uk/arch/lcpu.h>
+
 #include <caml/mlvalues.h>
 #include <caml/alloc.h>
 #include <caml/memory.h>
@@ -28,13 +31,11 @@
 #ifdef __ARM32__
 #include <xen-arm/os.h>
 #endif
-#define xen_mb() mb()
-#define xen_wmb() wmb()
 
 CAMLprim value
 caml_memory_barrier()
 {
-  xen_mb();
+  mb();
   return Val_unit;
 }
 

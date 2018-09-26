@@ -106,3 +106,11 @@ void _exit(int ret)
   }
   do_exit();
 }
+ssize_t write(int fd, const void* buf, size_t sz) {
+  //if (fd == 1 || fd == 2) {
+    uk_printd("%s\n", ((char*) buf));
+    return ((int) sz);
+  //}
+  //errno = ENOSYS;
+  //return -1;
+}
