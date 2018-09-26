@@ -11,14 +11,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  */
-
-#include <mini-os/os.h>
-#include <mini-os/console.h>
+#ifdef __X86_64__
+#include <xen-x86/os.h>
+#endif
+#ifdef __ARM32__
+#include <xen-arm/os.h>
+#endif
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 
-shared_info_t *map_shared_info(unsigned long pa);
+#include <uk/print.h> //uk_printk
+
 void unmap_shared_info();
 void init_time();
 void arch_rebuild_p2m();
@@ -51,7 +55,7 @@ stub_hypervisor_suspend(value unit)
   CAMLparam0();
   int cancelled;
 
-  printk("WARNING: stub_hypervisor_suspend not yet implemented\n");
+  uk_pr_warn("WARNING: stub_hypervisor_suspend not yet implemented\n");
   cancelled = 1;
   CAMLreturn(Val_int(cancelled));
 }

@@ -14,24 +14,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <stdint.h>
 #include <caml/mlvalues.h>
-#ifdef __X86_64__
-#include <xen-x86/mm.h>
-#endif
-#ifdef __ARM32__
-#include <xen-arm/mm.h>
-#endif
+#define CONFIG_LIBUKALLOC_IFPAGES 1
+#define CONFIG_LIBUKALLOC_IFSTATS 1
+#include <uk/alloc.h>
 
 CAMLprim value
 stub_heap_get_pages_total(value unit) // noalloc
 {
-  return Val_long(minios_heap_pages_total);
+  struct uk_alloc *allocator;
+  allocator = uk_alloc_get_default();
+  return Val_long(allocator->totalmem_pages(allocator));
 }
 
 CAMLprim value
 stub_heap_get_pages_used(value unit) // noalloc
 {
-  return Val_long(minios_heap_pages_used);
+  struct uk_alloc *allocator;
+  allocator = uk_alloc_get_default();
+  return Val_long(allocator->availmem_pages(allocator));
 }
 
 /* expose the virt_to_mfn macro for converting a "virtual address number"

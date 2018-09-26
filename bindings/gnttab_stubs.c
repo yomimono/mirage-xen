@@ -50,7 +50,7 @@ CAMLprim value stub_gnttab_interface_open(value unit)
 		/* FIXME: this should be done inside mini-os kernel.c */
 		map = (struct gntmap*) malloc(sizeof(struct gntmap));
 		gntmap_init(map);
-		printk("initialised mini-os gntmap\n");
+		uk_pr_crit("initialised mini-os^Wunikraft gntmap\n");
 	}
 	result = Val_unit;
 	CAMLreturn(result);
@@ -239,7 +239,7 @@ stub_gntshr_end_access(value v_ref)
 CAMLprim value stub_gntshr_share_pages_batched(value xgh, value domid, value count, value writable) {
     CAMLparam4(xgh, domid, count, writable);
     /* The OCaml code will never call this because gnttab_allocates is false */
-    printk("FATAL ERROR: stub_gntshr_share_pages_batched called\n");
+    uk_pr_crit("FATAL ERROR: stub_gntshr_share_pages_batched called\n");
     caml_failwith("stub_gntshr_share_pages_batched");
     CAMLreturn(Val_unit);
 }
@@ -247,7 +247,7 @@ CAMLprim value stub_gntshr_share_pages_batched(value xgh, value domid, value cou
 CAMLprim value stub_gntshr_munmap_batched(value xgh, value share) {
     CAMLparam2(xgh, share);
     /* The OCaml code will never call this because gnttab_allocates is false */
-    printk("FATAL ERROR: stub_gntshr_munmap_batched called\n");
+    uk_pr_crit("FATAL ERROR: stub_gntshr_munmap_batched called\n");
     caml_failwith("stub_gntshr_munmap_batched");
     CAMLreturn(Val_unit);
 }
@@ -257,7 +257,7 @@ stub_gnttab_map_onto(value i, value v_ref, value v_iopage, value v_domid, value 
 {
     CAMLparam5(i, v_ref, v_iopage, v_domid, v_writable);
     /* The OCaml code will never call this because gnttab_allocates is true */
-    printk("FATAL ERROR: stub_gnttab_map_onto called\n");
+    uk_pr_crit("FATAL ERROR: stub_gnttab_map_onto called\n");
     caml_failwith("stub_gnttab_map_onto");
     CAMLreturn(Val_unit);
 }

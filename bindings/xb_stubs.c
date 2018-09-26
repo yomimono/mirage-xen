@@ -11,8 +11,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  */
-#include <mini-os/os.h>
-#include <mini-os/lib.h>
+
+#include <uk/assert.h> //UK_ASSERT
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -21,10 +21,11 @@
 #include <caml/fail.h>
 #include <caml/callback.h>
 
+#include <stdint.h> //uint32_t
+#include <string.h> //memcpy
 
 #define __XEN_TOOLS__
 
-#define u32 uint32_t
 #include <xen/io/xs_wire.h>
 
 #if !HAVE_DECL_XS_RESTRICT
@@ -49,7 +50,7 @@ CAMLprim value stub_header_of_string(value s)
 	CAMLlocal1(ret);
 	struct xsd_sockmsg *hdr;
 
-	BUG_ON(caml_string_length(s) != sizeof(struct xsd_sockmsg));
+	UK_ASSERT(caml_string_length(s) == sizeof(struct xsd_sockmsg));
 	ret = caml_alloc_tuple(4);
 	hdr = (struct xsd_sockmsg *) String_val(s);
 	Store_field(ret, 0, Val_int(hdr->tx_id));

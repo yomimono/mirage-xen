@@ -13,14 +13,16 @@
  * GNU Lesser General Public License for more details.
  */
 
-#ifdef __X86_64__
+#if defined(__X86_64__) || defined(__X86_32__)
 #include <xen-x86/os.h>
 #endif
-#ifdef __ARM32__
+#if defined(__ARM_32__) || defined(__ARM_64__)
 #include <xen-arm/os.h>
 #endif
 #include <uk/plat/time.h>
 #include <common/events.h>
+#include <common/hypervisor.h> //for unmask_evtchn, etc
+#include <uk/arch/atomic.h> //ukarch_ffs
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -39,7 +41,7 @@ static uint8_t ev_callback_ml[NR_EVENTS];
 /* Override the default Mini-OS implementation. We don't want to call the event
    handlers here (from within the interrupt handler). Instead, we'll call
    evtchn_look_for_work later. */
-void do_hypervisor_callback(struct pt_regs *regs)
+void do_hypervisor_callback(struct __regs *regs)
 {
     int            cpu = 0;
     shared_info_t *s = HYPERVISOR_shared_info;
@@ -66,13 +68,13 @@ evtchn_look_for_work(void)
 #if !defined(__i386__) && !defined(__x86_64__)
     wmb();
 #endif
-  l1 = xchg(&vcpu_info->evtchn_pending_sel, 0);
+  l1 = ukarch_exchange_n(&vcpu_info->evtchn_pending_sel, 0);
   while ( l1 != 0 ) {
-    l1i = __ffs(l1);
+    l1i = ukarch_ffsl(l1);
     l1 &= ~(1UL << l1i);
 
     while ( (l2 = active_evtchns(cpu, s, l1i)) != 0 ) {
-      l2i = __ffs(l2);
+      l2i = ukarch_ffsl(l2);
       l2 &= ~(1UL << l2i);
 
       port = (l1i * (sizeof(unsigned long) * 8)) + l2i;
