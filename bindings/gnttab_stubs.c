@@ -16,22 +16,31 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <mini-os/os.h>
-#include <mini-os/mm.h>
-#include <mini-os/gnttab.h>
-#include <mini-os/lib.h>
+#include <stdint.h>
+
+#if defined(__X86_64__) || defined(__X86_32__)
+#include <xen-x86/mm.h>
+#endif
+#if defined(__ARM_64__) || defined(__ARM_32__)
+#include <xen-arm/mm.h>
+#endif
+
+#include <uk/alloc.h>
+
+#include <common/gnttab.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/bigarray.h>
 #include <caml/alloc.h>
 #include <caml/fail.h>
 
-/* For printk() */
-#include <log.h>
+#include <xen/grant_table.h>
+
+#include <uk/print.h>
 
 struct gntmap *map = NULL;
 
-/* Defined in minios gnttab.c: */
+/* Defined in unikraft gnttab.c: */
 extern grant_entry_t *gnttab_table;
 
 /* Note in particular EXTERNAL rather than MANAGED: we don't want anyone to
@@ -41,14 +50,19 @@ extern grant_entry_t *gnttab_table;
  */
 #define XC_GNTTAB_BIGARRAY (CAML_BA_UINT8 | CAML_BA_C_LAYOUT | CAML_BA_EXTERNAL)
 
+//these definitions were in minios-xen include/gnttab.h but aren't exposed in unikraft
+#define NR_GRANT_FRAMES 4
+#define NR_GRANT_ENTRIES (NR_GRANT_FRAMES * PAGE_SIZE / sizeof(grant_entry_t))
 
 CAMLprim value stub_gnttab_interface_open(value unit)
 {
 	CAMLparam1(unit);
 	CAMLlocal1(result);
 	if (!map) {
-		/* FIXME: this should be done inside mini-os kernel.c */
-		map = (struct gntmap*) malloc(sizeof(struct gntmap));
+                //get the allocator from unikraft
+                struct uk_alloc *allocator;
+                allocator = uk_alloc_get_default();
+		map = (struct gntmap*) uk_malloc(allocator, sizeof(struct gntmap));
 		gntmap_init(map);
 		uk_pr_crit("initialised mini-os^Wunikraft gntmap\n");
 	}
@@ -174,7 +188,7 @@ stub_gnttab_init(value unit)
 CAMLprim value
 stub_gnttab_reserved(value unit)
 {
-    return Val_int(NR_RESERVED_ENTRIES);
+    return Val_int(GNTTAB_NR_RESERVED_ENTRIES);
 }
 
 CAMLprim value
