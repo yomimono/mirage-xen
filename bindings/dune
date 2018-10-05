@@ -11,8 +11,8 @@
 (rule
  (targets libmirage-xen_bindings.a)
  (deps   atomic_stubs.o barrier_stubs.o clock_stubs.o cstruct_stubs.o
-         eventchn_stubs.o exit_stubs.o gnttab_stubs.o main.o mm_stubs.o
-         sched_stubs.o start_info_stubs.o xb_stubs.o)
+         eventchn_stubs.o exit_stubs.o gntmap.o gnttab_stubs.o main.o
+         mm_stubs.o sched_stubs.o start_info_stubs.o xb_stubs.o)
  (action (run ar rcs %{targets} %{deps})))
 
 (install
@@ -54,9 +54,14 @@
  (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
 
 (rule
+ (targets gntmap.o)
+ (deps    (:c gntmap.c gntmap.h))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
+
+(rule
  (targets gnttab_stubs.o)
- (deps    (:c gnttab_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (deps    (:c gnttab_stubs.c gntmap.o gntmap.h))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets main.o)
