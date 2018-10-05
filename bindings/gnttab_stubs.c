@@ -36,6 +36,8 @@
 
 #include <xen/grant_table.h>
 
+#include "gntmap.h"
+
 #include <uk/print.h>
 
 struct gntmap *map = NULL;

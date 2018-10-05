@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (library
   (name mirage_xen_bindings)
   (public_name mirage-xen.bindings)
@@ -10,9 +11,10 @@
   (name mirage_xen_bindings_minios)
   (public_name mirage-xen.bindings-minios)
   (no_dynlink)
-  (c_names barrier_stubs eventchn_stubs exit_stubs gnttab_stubs main sched_stubs start_info_stubs xb_stubs)
+  (c_names barrier_stubs eventchn_stubs exit_stubs gntmap_stubs gnttab_stubs main sched_stubs start_info_stubs xb_stubs)
   (c_flags (:include cflags_minios))
 )
+
 (install
  (section lib)
  (files (mirage-xen.pc as ../pkgconfig/mirage-xen.pc)))
