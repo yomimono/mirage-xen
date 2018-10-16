@@ -40,8 +40,7 @@
 
 struct gntmap *map = NULL;
 
-/* Defined in unikraft gnttab.c: */
-extern grant_entry_t *gnttab_table;
+static grant_entry_t *gnttab_table;
 
 /* Note in particular EXTERNAL rather than MANAGED: we don't want anyone to
    call free() on a grant mapping -- nothing good can come of that. To quote
@@ -168,6 +167,20 @@ CAMLprim value stub_gnttab_mapv_batched(value xgh, value array, value writable)
     Store_field(pair, 0, handle); /* grant_handle */
     Store_field(pair, 1, contents); /* Io_page.t */
     CAMLreturn(pair);
+}
+
+CAMLprim value
+stub_gnttab_init(value unit)
+{
+    gnttab_table = gnttab_arch_init(NR_GRANT_FRAMES);
+    return Val_unit;
+}
+
+CAMLprim value
+stub_gnttab_fini(value unit)
+{
+    gnttab_fini();
+    return Val_unit;
 }
 
 /* Return the number of reserved grant entries at the start */
