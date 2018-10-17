@@ -13,16 +13,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#if (defined __X86_64__) || (defined __X86_32__)
-#include <x86/irq.h> //for local_irq_enable
-#endif
-#if (defined __ARM_64__) || (defined __ARM_32__)
-#include <arm/irq.h>
-#endif
-
 #include <stdint.h>
 #include <_time.h> //for time_block_until, unpleasantly
-#include <xen/sched.h>
+#include <xen/sched.h> //for inlined ukplat_entry_argp
 #include <common/console.h>
 #include <common/events.h>
 #include <common/gnttab.h>
@@ -31,16 +24,23 @@
 #include <uk/plat/bootstrap.h>
 #include <time.h>
 
+#include <uk/plat/lcpu.h>
+
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/callback.h>
 
 #include <uk/print.h>
 
-void _exit(int);
+#define HAVE_BOOTENTRY
+
+void exit(int);
+void abort(); //TODO: some error output here, if we can do it without invoking too much potentially failing stuff
+//also TODO: see whether there's a better exit function from unikraft API to be calling
+ssize_t write(int, const void*, size_t);
 int errno;
-static char *argv[] = { "mirage", NULL };
-static unsigned long irqflags;
+static char *our_argv[] = { "mirage", NULL };
+unsigned long irqflags;
 
 typedef int64_t s_time_t; //TODO this is copied from minios-xen time.t; unikraft uses s_time_t only internally and only then for arm
 
@@ -52,56 +52,38 @@ caml_block_domain(value v_until)
   CAMLparam1(v_until);
   s_time_t t0, t1;
   t0 = ukplat_monotonic_clock();
-  block_domain((s_time_t)(Int64_val(v_until)));
+  time_block_until((s_time_t)(Int64_val(v_until)));
   t1 = ukplat_monotonic_clock();
   not_running_time += t1 - t0;
   CAMLreturn(Val_unit);
 }
-
-void app_main(void *unused)
+int main(int argc __unused, char *argv[] __unused)
 {
-  local_irq_save(irqflags);
-  caml_startup(argv);
-  _exit(0);
+  irqflags = ukplat_lcpu_save_irqf();
+
+  uk_pr_debug("Starting OCaml...\n");
+
+  caml_startup(our_argv);
+  exit(0);
 }
 
-void start_kernel(void* nonsense)
+void exit(int ret)
 {
-  /* Set up events. */
-  init_events();
-
-  /* Enable event delivery. This is disabled at start of day. */
-  local_irq_enable();
-
-  //setup_xen_features();
-
-  /* MCP - pretty sure we don't actually need to do our own memory init, and it might
-   * be harmful to do so */
-
-  /* Init time and timers. Needed for block_domain. */
-  ukplat_time_init();
-  not_running_time = ukplat_monotonic_clock();
-
-  /* Init the console driver.
-   * We probably do need this if we want printk to send notifications correctly. */
-  _libxenplat_init_console();
-
-  /* Init grant tables. */
-  gnttab_init();
-
-  /* Call our main function directly, without using Mini-OS threads. */
-  app_main(NULL);
-}
-
-void _exit(int ret)
-{
+  uk_pr_debug("exiting with code %d\n", ret);
   ukplat_terminate(UKPLAT_HALT);
 }
+
+void abort()
+{
+  uk_pr_err("ABORT\n");
+  ukplat_terminate(UKPLAT_HALT);
+}
+
 ssize_t write(int fd, const void* buf, size_t sz) {
-  //if (fd == 1 || fd == 2) {
+  if (fd == 1 || fd == 2) {
     uk_printd("%s\n", ((char*) buf));
     return ((int) sz);
-  //}
-  //errno = ENOSYS;
-  //return -1;
+  }
+  errno = ENOSYS;
+  return -1;
 }
