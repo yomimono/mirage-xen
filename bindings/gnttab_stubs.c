@@ -203,7 +203,11 @@ stub_gnttab_nr_entries(value unit)
 static void
 gntshr_grant_access(grant_ref_t ref, void *page, int domid, int ro)
 {
+#ifdef CONFIG_PARAVIRT
     gnttab_table[ref].frame = virt_to_mfn(page);
+#else
+    gnttab_table[ref].frame = virt_to_pfn(page);
+#endif
     gnttab_table[ref].domid = domid;
     wmb();
     gnttab_table[ref].flags = GTF_permit_access | (ro * GTF_readonly);
