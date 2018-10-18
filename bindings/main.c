@@ -13,13 +13,15 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#if (defined __X86_64__) || (defined __X86_32__)
+#include <x86/irq.h> //for local_irq_enable
+#endif
+#if (defined __ARM_64__) || (defined __ARM_32__)
+#include <arm/irq.h>
+#endif
 
-#ifdef __X86_64__
-#include <xen-x86/os.h>
-#endif
-#ifdef __ARM32__
-#include <xen-arm/os.h>
-#endif
+#include <stdint.h>
+#include <_time.h> //for time_block_until, unpleasantly
 #include <xen/sched.h>
 #include <common/console.h>
 #include <common/events.h>
