@@ -32,18 +32,14 @@
  */
 
 #include <stdint.h>
-#if defined(__X86_64__) || defined(__X86_32__)
-#include <xen-x86/os.h>
-#include <xen-x86/mm.h>
-#endif
-#if defined(__ARM_64__) || defined(__ARM_32__)
-#include <xen-arm/os.h>
-#include <xen-arm/mm.h>
-#endif
 #include <uk/alloc.h>
 #include <uk/print.h>
 #include <errno.h>
 #include <xen/grant_table.h>
+#include <common/hypervisor.h>
+#if (defined __X86_64__) || (defined __X86_32__)
+#include <xen-x86/mm.h> //for allocate_ondemand
+#endif
 #include "gntmap.h"
 
 #include <uk/arch/types.h> //for PRIu16, 32

@@ -13,12 +13,7 @@
  * GNU Lesser General Public License for more details.
  */
 
-#if defined(__X86_64__) || defined(__X86_32__)
-#include <xen-x86/os.h>
-#endif
-#if defined(__ARM_32__) || defined(__ARM_64__)
-#include <xen-arm/os.h>
-#endif
+#include <stdint.h>
 #include <uk/plat/time.h>
 #include <common/events.h>
 #include <common/hypervisor.h> //for unmask_evtchn, etc

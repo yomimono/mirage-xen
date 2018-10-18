@@ -11,13 +11,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  */
-#ifdef __X86_64__
-#include <xen-x86/os.h>
-#endif
-#ifdef __ARM32__
-#include <xen-arm/os.h>
-#endif
-
+#include <stdint.h>
+#include <common/hypervisor.h>
+#include <xen/sched.h>
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 

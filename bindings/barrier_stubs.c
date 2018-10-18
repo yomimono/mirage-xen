@@ -25,13 +25,6 @@
 #include <caml/memory.h>
 #include <caml/bigarray.h>
 
-#ifdef __X86_64__
-#include <xen-x86/os.h>
-#endif
-#ifdef __ARM32__
-#include <xen-arm/os.h>
-#endif
-
 CAMLprim value
 caml_memory_barrier()
 {
