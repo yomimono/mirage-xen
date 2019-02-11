@@ -48,7 +48,7 @@
 
 #include <uk/arch/types.h> //for PRIu16, 32
 
-//#define GNTMAP_DEBUG
+#define GNTMAP_DEBUG
 #ifdef GNTMAP_DEBUG
 #define DEBUG(_f, _a...) \
     uk_pr_debug("mirage-xen(gntmap.c:%d): %s" _f "\n", __LINE__, __func__, ## _a)
