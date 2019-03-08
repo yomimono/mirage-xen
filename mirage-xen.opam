@@ -23,9 +23,8 @@ depends: [
   "conf-pkg-config"
   "lwt-dllist"
   "mirage-profile" {>= "0.3"}
-  "mirage-xen-ocaml" {>= "3.3.1"}
   "io-page-xen" {>= "2.0.0"}
-  "mirage-xen-minios" {>= "0.7.0"}
+  "ocaml-freestanding"
   "logs"
   "fmt"
 ]
