@@ -16,6 +16,10 @@
 
 #include <stdint.h>
 #include <caml/mlvalues.h>
+#include <caml/memory.h>
+#ifdef __X86_64__
+#include <xen-x86/mm.h>
+#endif
 #define CONFIG_LIBUKALLOC_IFPAGES 1
 #define CONFIG_LIBUKALLOC_IFSTATS 1
 #include <uk/alloc.h>
