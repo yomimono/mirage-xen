@@ -3,7 +3,7 @@
  (public_name mirage-xen.internals)
  (wrapped true)
  (modules :standard \ OS)
- (libraries lwt cstruct xen-evtchn xenstore.client shared-memory-ring-lwt mirage-profile logs io-page-xen fmt mirage-xen.bindings))
+ (libraries lwt lwt-dllist cstruct xen-evtchn xenstore.client shared-memory-ring-lwt mirage-profile logs io-page-xen fmt mirage-xen.bindings))
 
 (library
   (name OS)
