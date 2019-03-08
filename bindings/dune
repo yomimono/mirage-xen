@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 (library
   (name mirage_xen_bindings)
   (public_name mirage-xen.bindings)
@@ -12,12 +11,11 @@
   (public_name mirage-xen.bindings-minios)
   (no_dynlink)
   (c_names barrier_stubs eventchn_stubs exit_stubs gntmap_stubs gnttab_stubs main sched_stubs start_info_stubs xb_stubs)
-  (c_flags (:include cflags_minios))
+  (c_flags (:include cflags))
 )
 
 (install
  (section lib)
  (files (mirage-xen.pc as ../pkgconfig/mirage-xen.pc)))
 
-(rule (copy %{lib:mirage-xen-ocaml:cflags} cflags))
-(rule (copy %{lib:mirage-xen-posix:minios-cflags} cflags_minios))
+(rule (copy %{lib:xenplat:cflags} cflags))
