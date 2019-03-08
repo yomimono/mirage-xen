@@ -16,8 +16,8 @@ let () =
          match C.Pkg_config.query pc ~package with
          | None -> failwith (Printf.sprintf "pkg-config(%s) not found" package)
          | Some v -> v.cflags in
-       let base_cflags = "-Wno-attributes" :: "-O2" :: "-fPIC" :: (flags_for "mirage-xen-ocaml") in
-       let minios_cflags = base_cflags @ (flags_for "mirage-xen-minios") in
+       let base_cflags = "-Wno-attributes" :: "-O2" :: "-fPIC" :: (flags_for "ocaml-freestanding") in
+       let unikraft_cflags = base_cflags @ (flags_for "libxenplat") in
        C.Flags.write_lines "cflags" base_cflags;
-       C.Flags.write_lines "minios-cflags" minios_cflags
+       C.Flags.write_lines "unikraft-cflags" unikraft_cflags
   )

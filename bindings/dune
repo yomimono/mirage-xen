@@ -4,7 +4,7 @@
  (libraries dune.configurator))
 
 (rule
-  (targets cflags minios-cflags)
+  (targets cflags unikraft-cflags)
   (deps discover.exe)
   (action (run ./discover.exe)))
 
@@ -31,7 +31,7 @@
 (rule
  (targets barrier_stubs.o)
  (deps    (:c barrier_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets clock_stubs.o)
@@ -46,12 +46,12 @@
 (rule
  (targets eventchn_stubs.o)
  (deps    (:c eventchn_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets exit_stubs.o)
  (deps    (:c exit_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets gntmap.o)
@@ -66,7 +66,7 @@
 (rule
  (targets main.o)
  (deps    (:c main.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets mm_stubs.o)
@@ -76,16 +76,16 @@
 (rule
  (targets sched_stubs.o)
  (deps    (:c sched_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets start_info_stubs.o)
  (deps    (:c start_info_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 (rule
  (targets xb_stubs.o)
  (deps    (:c xb_stubs.c))
- (action  (run %{cc} %{read-lines:minios-cflags} -c %{c})))
+ (action  (run %{cc} %{read-lines:unikraft-cflags} -c %{c})))
 
 
