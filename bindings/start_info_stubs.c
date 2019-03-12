@@ -98,21 +98,10 @@ caml_console_start_page(value v_unit)
                                 mfn_to_virt(HYPERVISOR_start_info->pv.console.domU.mfn),
                                 (long)PAGE_SIZE));
 #else /* CONFIG_PARAVIRT */
-  uint64_t console;
-  ///hvm_get_parameter is missing, so construct our own call to HYPERVISOR_hvm_op
-  //code copied from hypervisor.c in minios-xen
-  struct xen_hvm_param xhv;
-  int ret;
-  
-  xhv.domid = DOMID_SELF; //known from grant_table.h
-  xhv.index = HVM_PARAM_CONSOLE_PFN;
-  ret = HYPERVISOR_hvm_op(HVMOP_get_param, &xhv);
-  UK_ASSERT(ret >= 0);
-  console = xhv.value;
-  
+  extern char console_ring_page[];
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
-                                pfn_to_virt(console),
+                                console_ring_page,
                                 (long)PAGE_SIZE));
 #endif
 }
@@ -136,11 +125,12 @@ caml_xenstore_start_page(value v_unit)
 #ifdef CONFIG_PARAVIRT
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
-                                mfn_to_virt(HYPERVISOR_start_info->store_mfn),
+                                mfn_to_virt(HYPERVISOR_start_info->pv.store_mfn),
                                 (long)PAGE_SIZE));
 #else /* CONFIG_PARAVIRT */
   uint64_t store;
   store = hvm_get_parameter(HVM_PARAM_STORE_PFN, &store);
+  /* FIXME: map this store page somewhere */
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
                                 (void *)pfn_to_virt(store),
