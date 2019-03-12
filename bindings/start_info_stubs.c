@@ -48,28 +48,28 @@ stub_start_info_get(value unit)
   char buf[MAX_GUEST_CMDLINE+1];
 
   result = caml_alloc_tuple(16);
-  memcpy(buf, HYPERVISOR_start_info->magic, sizeof(HYPERVISOR_start_info->magic));
-  buf[sizeof(HYPERVISOR_start_info->magic)] = 0;
+  memcpy(buf, HYPERVISOR_start_info->pv.magic, sizeof(HYPERVISOR_start_info->pv.magic));
+  buf[sizeof(HYPERVISOR_start_info->pv.magic)] = 0;
   tmp = caml_copy_string(buf);
   Store_field(result, 0, tmp);
-  Store_field(result, 1, Val_int(HYPERVISOR_start_info->nr_pages));
-  Store_field(result, 2, Val_int(HYPERVISOR_start_info->shared_info));
-  Store_field(result, 3, Val_int(HYPERVISOR_start_info->flags));
-  Store_field(result, 4, Val_int(HYPERVISOR_start_info->store_mfn));
-  Store_field(result, 5, Val_int(HYPERVISOR_start_info->store_evtchn));
-  Store_field(result, 6, Val_int(HYPERVISOR_start_info->console.domU.mfn));
-  Store_field(result, 7, Val_int(HYPERVISOR_start_info->console.domU.evtchn));
-  Store_field(result, 8, Val_int(HYPERVISOR_start_info->pt_base));
-  Store_field(result, 9, Val_int(HYPERVISOR_start_info->nr_pt_frames));
-  Store_field(result, 10, Val_int(HYPERVISOR_start_info->mfn_list));
-  Store_field(result, 11, Val_int(HYPERVISOR_start_info->mod_start));
-  Store_field(result, 12, Val_int(HYPERVISOR_start_info->mod_len));
-  memcpy(buf, HYPERVISOR_start_info->cmd_line, MAX_GUEST_CMDLINE);
+  Store_field(result, 1, Val_int(HYPERVISOR_start_info->pv.nr_pages));
+  Store_field(result, 2, Val_int(HYPERVISOR_start_info->pv.shared_info));
+  Store_field(result, 3, Val_int(HYPERVISOR_start_info->pv.flags));
+  Store_field(result, 4, Val_int(HYPERVISOR_start_info->pv.store_mfn));
+  Store_field(result, 5, Val_int(HYPERVISOR_start_info->pv.store_evtchn));
+  Store_field(result, 6, Val_int(HYPERVISOR_start_info->pv.console.domU.mfn));
+  Store_field(result, 7, Val_int(HYPERVISOR_start_info->pv.console.domU.evtchn));
+  Store_field(result, 8, Val_int(HYPERVISOR_start_info->pv.pt_base));
+  Store_field(result, 9, Val_int(HYPERVISOR_start_info->pv.nr_pt_frames));
+  Store_field(result, 10, Val_int(HYPERVISOR_start_info->pv.mfn_list));
+  Store_field(result, 11, Val_int(HYPERVISOR_start_info->pv.mod_start));
+  Store_field(result, 12, Val_int(HYPERVISOR_start_info->pv.mod_len));
+  memcpy(buf, HYPERVISOR_start_info->pv.cmd_line, MAX_GUEST_CMDLINE);
   buf[MAX_GUEST_CMDLINE] = 0;
   tmp = caml_copy_string(buf);
   Store_field(result, 13, tmp);
-  Store_field(result, 14, Val_int(HYPERVISOR_start_info->first_p2m_pfn));
-  Store_field(result, 15, Val_int(HYPERVISOR_start_info->nr_p2m_frames));
+  Store_field(result, 14, Val_int(HYPERVISOR_start_info->pv.first_p2m_pfn));
+  Store_field(result, 15, Val_int(HYPERVISOR_start_info->pv.nr_p2m_frames));
   CAMLreturn(result);
 }
 #endif
@@ -80,7 +80,9 @@ caml_cmdline(value v_unit)
   CAMLparam1(v_unit);
   char buf[MAX_GUEST_CMDLINE+1];
 #ifdef CONFIG_PARAVIRT
-  memcpy(buf, HYPERVISOR_start_info->cmd_line, MAX_GUEST_CMDLINE);
+  memcpy(buf, HYPERVISOR_start_info->pv.cmd_line, MAX_GUEST_CMDLINE);
+#else
+  memcpy(buf, HYPERVISOR_start_info->hvm.cmdline_paddr, MAX_GUEST_CMDLINE);
 #endif /* CONFIG_PARAVIRT */
   buf[MAX_GUEST_CMDLINE] = 0;
   CAMLreturn(caml_copy_string(buf));
@@ -93,24 +95,13 @@ caml_console_start_page(value v_unit)
 #ifdef CONFIG_PARAVIRT
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
-                                mfn_to_virt(HYPERVISOR_start_info->console.domU.mfn),
+                                mfn_to_virt(HYPERVISOR_start_info->pv.console.domU.mfn),
                                 (long)PAGE_SIZE));
 #else /* CONFIG_PARAVIRT */
-  uint64_t console;
-  ///hvm_get_parameter is missing, so construct our own call to HYPERVISOR_hvm_op
-  //code copied from hypervisor.c in minios-xen
-  struct xen_hvm_param xhv;
-  int ret;
-  
-  xhv.domid = DOMID_SELF; //known from grant_table.h
-  xhv.index = HVM_PARAM_CONSOLE_PFN;
-  ret = HYPERVISOR_hvm_op(HVMOP_get_param, &xhv);
-  UK_ASSERT(ret >= 0);
-  console = xhv.value;
-  
+  extern char console_ring_page[];
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
-                                pfn_to_virt(console),
+                                console_ring_page,
                                 (long)PAGE_SIZE));
 #endif
 }
@@ -119,7 +110,7 @@ CAMLprim value caml_xenstore_event_channel(value v_unit)
 {
   CAMLparam1(v_unit);
 #ifdef CONFIG_PARAVIRT
-  CAMLreturn (Val_int(HYPERVISOR_start_info->store_evtchn));
+  CAMLreturn (Val_int(HYPERVISOR_start_info->pv.store_evtchn));
 #else
   uint64_t evtchn;
   hvm_get_parameter(HVM_PARAM_STORE_EVTCHN, &evtchn);
@@ -134,11 +125,12 @@ caml_xenstore_start_page(value v_unit)
 #ifdef CONFIG_PARAVIRT
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
-                                mfn_to_virt(HYPERVISOR_start_info->store_mfn),
+                                mfn_to_virt(HYPERVISOR_start_info->pv.store_mfn),
                                 (long)PAGE_SIZE));
 #else /* CONFIG_PARAVIRT */
   uint64_t store;
   store = hvm_get_parameter(HVM_PARAM_STORE_PFN, &store);
+  /* FIXME: map this store page somewhere */
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
                                 (void *)pfn_to_virt(store),
