@@ -139,6 +139,7 @@ caml_xenstore_start_page(value v_unit)
 #else /* CONFIG_PARAVIRT */
   uint64_t store;
   store = hvm_get_parameter(HVM_PARAM_STORE_PFN, &store);
+  /* this won't work - you need to put this into the page table, which isn't exposed in unikraft API */
   CAMLreturn(caml_ba_alloc_dims(CAML_BA_UINT8 | CAML_BA_C_LAYOUT,
                                 1,
                                 (void *)pfn_to_virt(store),
