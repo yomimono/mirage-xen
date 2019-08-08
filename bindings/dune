@@ -4,14 +4,14 @@
   (libraries mirage-xen.bindings-minios)
   (no_dynlink)
   (c_names atomic_stubs clock_stubs cstruct_stubs mm_stubs)
-  (c_flags (:include cflags))
+  (c_flags (:include cflags) (:include cflags-freestanding))
 )
 (library
   (name mirage_xen_bindings_minios)
   (public_name mirage-xen.bindings-minios)
   (no_dynlink)
   (c_names barrier_stubs eventchn_stubs exit_stubs gntmap gnttab_stubs main sched_stubs start_info_stubs xb_stubs)
-  (c_flags (:include cflags))
+  (c_flags (:include cflags) (:include cflags-freestanding))
 )
 
 (install
@@ -19,3 +19,4 @@
  (files (mirage-xen.pc as ../pkgconfig/mirage-xen.pc)))
 
 (rule (copy %{lib:xenplat:cflags} cflags))
+(rule (copy %{lib:ocaml-freestanding:cflags} cflags-freestanding))
