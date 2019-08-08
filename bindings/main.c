@@ -81,6 +81,7 @@ void abort()
 
 ssize_t write(int fd, const void* buf, size_t sz) {
   if (fd == 1 || fd == 2) {
+    ((char *)buf)[sz] = '\0';
     uk_printd("%s\n", ((char*) buf));
     return ((int) sz);
   }
