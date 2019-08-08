@@ -57,8 +57,6 @@ static grant_entry_t *gnttab_table;
 
 void gnttab_init(void)
 {
-	CAMLparam1(unit);
-	CAMLlocal1(result);
 	if (!map) {
                 //get the allocator from unikraft
                 struct uk_alloc *allocator;
@@ -67,8 +65,6 @@ void gnttab_init(void)
 		gntmap_init(map);
 		uk_pr_crit("initialised mini-os^Wunikraft gntmap\n");
 	}
-	result = Val_unit;
-	CAMLreturn(result);
 }
 
 CAMLprim value stub_gnttab_interface_close(value unit)
